@@ -1,0 +1,23 @@
+{
+    "appId": "BLiveHelper",
+    "productName": "BLiveHelper",
+    "copyright": "Hakura Tech",
+    "win": {
+        "artifactName": "${productName}_Setup_${version}.${ext}",
+        "target": "nsis",
+        "icon": "favicon.ico",
+        "publisherName": "Hakura"
+    },
+    "nsis": {
+        "installerIcon": "favicon.ico",
+        "uninstallerIcon": "favicon.ico",
+        "oneClick": false,
+        "perMachine": true,
+        "allowToChangeInstallationDirectory": true
+    },
+    "publish": {
+        "provider": "generic",
+        "url": "https://b-helper.oss-cn-shanghai.aliyuncs.com/BLiveHelper/",
+        "useMultipleRangeRequest": false
+    }
+}
