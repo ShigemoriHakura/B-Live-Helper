@@ -64,10 +64,10 @@
                       <td>{{ item.nickname }}</td>
                       <td>{{ item.userId }}</td>
                       <td>{{ item.content }}</td>
-                      <v-btn class="ma-2" elevation="2" color="warning"
+                      <!--<v-btn class="ma-2" elevation="2" color="warning"
                         @click="dialogSet('addManager', item.nickname, item.userId)">房管</v-btn>
                       <v-btn class="ma-2" elevation="2" @click="dialogSet('block', item.nickname, item.userId)">拉黑
-                      </v-btn>
+                      </v-btn>-->
                     </tr>
                   </tbody>
                 </template>
@@ -145,20 +145,22 @@ export default {
     this.$store.watch((state) => state.roomInfo.danmakuList, async (newValue, oldValue) => {
       var danmaku = newValue[0]
       console.log('房间助手：弹幕状态变更')
-      if (this.$store.state.TTSInfo.isTTS) {
-        let result = this.$store.state.TTSInfo.TTSList.find(c => Number(c.userId) === danmaku.userId)
-        var push = true
-        if (result) {
-          if (result.content == danmaku.content) {
-            push = false
-            result.num += danmaku.num
+      if (danmaku) {
+        if (this.$store.state.TTSInfo.isTTS) {
+          let result = this.$store.state.TTSInfo.TTSList.find(c => Number(c.userId) === danmaku.userId)
+          var push = true
+          if (result) {
+            if (result.content == danmaku.content) {
+              push = false
+              result.num += danmaku.num
+            }
           }
-        }
-        if (push) {
-          if (danmaku.isGift && this.$store.state.TTSInfo.TTSgift) {
-            this.$store.state.TTSInfo.TTSList.push(danmaku)
-          } else {
-            this.$store.state.TTSInfo.TTSList.push(danmaku)
+          if (push) {
+            if (danmaku.isGift && this.$store.state.TTSInfo.TTSgift) {
+              this.$store.state.TTSInfo.TTSList.push(danmaku)
+            } else {
+              this.$store.state.TTSInfo.TTSList.push(danmaku)
+            }
           }
         }
       }

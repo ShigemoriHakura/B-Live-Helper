@@ -112,7 +112,7 @@ export default {
     },
     wsConnect() {
       const url = `wss://danmu.loli.ren/chat`
-      //const url = `ws://localhost:12451/chat`
+      //const url = `ws://localhost:23456/chat`
       this.websocket = new WebSocket(url)
       this.websocket.onopen = this.onWsOpen
       this.websocket.onclose = this.onWsClose
@@ -129,8 +129,7 @@ export default {
       this.websocket.send(JSON.stringify({
         cmd: COMMAND_JOIN_ROOM,
         data: {
-          roomId: parseInt(35119946),
-          broomId: parseInt(this.$store.state.roomInfo.roomId),
+          roomId: parseInt(this.$store.state.roomInfo.roomId),
           version: "9.9.9",
           config: {
             autoTranslate: false

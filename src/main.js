@@ -20,7 +20,7 @@ Vue.use(VueClipboard)
 Vue.use(Vuex)
 
 
-Vue.prototype.$version = "0.1.0"
+Vue.prototype.$version = "0.1.1"
 Vue.prototype.$BilibiliCommon = BilibiliCommon
 
 const store = new Vuex.Store({

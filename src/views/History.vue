@@ -18,8 +18,12 @@
               </thead>
               <tbody>
                 <tr>
+                  <td>0.1.1</td>
+                  <td>基础功能完成，开始完善其他功能。</td>
+                </tr>
+                <tr>
                   <td>0.1.0</td>
-                  <td>感谢使用！</td>
+                  <td>初版，主要代码完善中。</td>
                 </tr>
               </tbody>
             </template>
