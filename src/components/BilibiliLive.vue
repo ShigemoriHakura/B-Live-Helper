@@ -639,7 +639,7 @@ export default {
       this.$store.state.snackbar.show = true
     },
     downloadOBSWS() {
-      shell.openExternal("https://acfun-helper.oss-cn-shanghai.aliyuncs.com/ACLiveHelper/OBS/obs-websocket-4.8.0-Windows-Installer.exe")
+      shell.openExternal("https://b-helper.oss-cn-shanghai.aliyuncs.com/BLiveHelper/OBS/obs-websocket-4.8.0-Windows-Installer.exe")
     },
     saveToCache(type) {
       switch (type) {
