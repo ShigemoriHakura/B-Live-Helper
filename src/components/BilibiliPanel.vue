@@ -66,8 +66,6 @@
                       <td>{{ item.content }}</td>
                       <v-btn class="ma-2" elevation="2" color="warning"
                         @click="dialogSet('addManager', item.nickname, item.userId)">房管</v-btn>
-                      <v-btn class="ma-2" elevation="2" color="error"
-                        @click="dialogSet('kick', item.nickname, item.userId)">踢出</v-btn>
                       <v-btn class="ma-2" elevation="2" @click="dialogSet('block', item.nickname, item.userId)">拉黑
                       </v-btn>
                     </tr>
@@ -134,7 +132,7 @@ export default {
   },
   async created() {
     var result = await this.$BilibiliCommon.getHTTPResult(
-      "https://acfun-helper.oss-cn-shanghai.aliyuncs.com/BLiveHelper/latest.yml",
+      "https://b-helper.oss-cn-shanghai.aliyuncs.com/BLiveHelper/latest.yml",
       "",
       []
     )
@@ -276,12 +274,12 @@ export default {
       switch (this.dialogAction) {
         case "update":
           var result = await this.$BilibiliCommon.getHTTPResult(
-            "https://acfun-helper.oss-cn-shanghai.aliyuncs.com/BLiveHelper/latest.yml",
+            "https://b-helper.oss-cn-shanghai.aliyuncs.com/BLiveHelper/latest.yml",
             "",
             []
           )
           const doc = yaml.safeLoad(result.body)
-          shell.openExternal("https://acfun-helper.oss-cn-shanghai.aliyuncs.com/BLiveHelper/" + doc.path)
+          shell.openExternal("https://b-helper.oss-cn-shanghai.aliyuncs.com/BLiveHelper/" + doc.path)
           break
       }
       this.dialogClose()

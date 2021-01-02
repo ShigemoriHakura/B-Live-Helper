@@ -18,6 +18,7 @@ export default {
     that.$store.state.obsInfo.obsPort = econfig.get("obsInfo.obsPort")
     that.$store.state.obsInfo.obsPass = econfig.get("obsInfo.obsPass")
     that.$store.state.obsInfo.obsEnabled = econfig.get("obsInfo.obsEnabled")
+    that.$store.state.obsInfo.obsStartStreamingAfterStart = econfig.get("obsInfo.obsStartStreamingAfterStart")
     that.$store.state.obsInfo.obsStopStreamingAfterClose = econfig.get("obsInfo.obsStopStreamingAfterClose")
 
     //读取TTS信息
@@ -34,6 +35,11 @@ export default {
       }
     }
 
+    var liveInfo = econfig.get("liveInfo")
+    if (liveInfo != undefined) {
+      that.$store.state.liveInfo = liveInfo
+    }
+
     that.$store.commit('addLog', "读取设置内容完成")
   },
 
@@ -42,11 +48,13 @@ export default {
     econfig.set("BilibiliCommonCache.cookies", that.$store.state.BilibiliCommonCache.cookies)
 
     //保存的房间ID，弹幕显示用
-
     econfig.set("obsInfo.obsPort", that.$store.state.obsInfo.obsPort)
     econfig.set("obsInfo.obsPass", that.$store.state.obsInfo.obsPass)
     econfig.set("obsInfo.obsEnabled", that.$store.state.obsInfo.obsEnabled)
+    econfig.set("obsInfo.obsStartStreamingAfterStart", that.$store.state.obsInfo.obsStartStreamingAfterStart)
     econfig.set("obsInfo.obsStopStreamingAfterClose", that.$store.state.obsInfo.obsStopStreamingAfterClose)
+
+    econfig.set("liveInfo", that.$store.state.liveInfo)
 
     that.$store.commit('addLog', "保存设置内容完成")
   },
@@ -120,6 +128,22 @@ export default {
           Referer: referer,
           cookie: cookies,
           "content-type": contentType,
+          "user-agent": UserAgent,
+        },
+        body: body,
+      })
+      return res
+    } catch (error) {
+      return error.response
+    }
+  },
+  async postHTTPFormData(url, referer, cookies, body) {
+    try {
+      const res = await got(url, {
+        method: "POST",
+        headers: {
+          Referer: referer,
+          cookie: cookies,
           "user-agent": UserAgent,
         },
         body: body,

@@ -38,18 +38,11 @@ export default {
   }),
   beforeDestroy() {
     this.fetchLoginStatus = false
-    clearTimeout(this.fetchLoginStatusTimer)
+    window.clearInterval(this.fetchLoginStatusTimer)
   },
   async created() {
     if (!this.$store.state.config.isLogin) {
-      var data = await axios.get("https://passport.bilibili.com/qrcode/getLoginUrl")
-      console.log(data.data)
-      if (data.data.code == 0) {
-        this.qrcodeUrl = data.data.data.url
-        this.fetchLoginStatus = true
-        this.loginData = data.data
-        this.fetchLogin()
-      }
+      this.reloadAccount()
     }
   },
   methods: {
@@ -93,6 +86,18 @@ export default {
       this.$store.state.config.isLogin = false
       this.$store.state.BilibiliCommonCache.cookies = {}
       this.$BilibiliCommon.saveNewData(this)
+      window.clearInterval(this.fetchLoginStatusTimer)
+      this.reloadAccount()
+    },
+    async reloadAccount() {
+      var data = await axios.get("https://passport.bilibili.com/qrcode/getLoginUrl")
+      console.log(data.data)
+      if (data.data.code == 0) {
+        this.qrcodeUrl = data.data.data.url
+        this.fetchLoginStatus = true
+        this.loginData = data.data
+        this.fetchLogin()
+      }
     }
   }
 }

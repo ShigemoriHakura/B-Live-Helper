@@ -54,12 +54,22 @@ const store = new Vuex.Store({
       danmakuList: []
     },
     liveInfo: {
-
+      isLive: false,
+      liveTitle: "",
+      liveStreamUrl: "",
+      liveStreamKey: "",
+      liveCategoryId: 0,
+      liveConcreteId: 0,
+      cacheCovers: [],
+    },
+    liveCoverCache: {
+      liveCover: "",
     },
     obsInfo: {
       obsPort: 4444,
       obsPass: "",
       obsEnabled: false,
+      obsStartStreamingAfterStart: false,
       obsStopStreamingAfterClose: false,
     },
     logList: [],

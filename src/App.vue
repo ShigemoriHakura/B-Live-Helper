@@ -111,8 +111,8 @@ export default {
       return false
     },
     wsConnect() {
-      //const url = `wss://danmaku.loli.ren/chat`
-      const url = `ws://localhost:12451/chat`
+      const url = `wss://danmu.loli.ren/chat`
+      //const url = `ws://localhost:12451/chat`
       this.websocket = new WebSocket(url)
       this.websocket.onopen = this.onWsOpen
       this.websocket.onclose = this.onWsClose
