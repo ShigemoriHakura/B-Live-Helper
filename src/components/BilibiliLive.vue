@@ -36,7 +36,7 @@
               <v-col cols="12" md="12">
                 <v-text-field v-model="$store.state.liveInfo.liveStreamUrl" type="text" label="推流地址" disabled>
                 </v-text-field>
-                <v-text-field v-model="$store.state.liveInfo.liveStreamKey" type="text" label="推流码" disabled>
+                <v-text-field v-model="$store.state.liveInfo.liveStreamKey" type="password" label="推流码" disabled>
                 </v-text-field>
                 <v-btn class="ma-2" elevation="2" color="warning" v-if="$store.state.obsInfo.obsEnabled"
                   @click="writeOBSWS">

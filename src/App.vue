@@ -31,7 +31,7 @@
 </template>
 
 <script>
-
+import { KeepLiveWS } from 'bilibili-live-ws';
 import http from "http";
 import { ipcRenderer } from 'electron';
 
@@ -63,10 +63,7 @@ export default {
       right: null,
 
       //ws部分
-      websocket: null,
-      retryCount: 0,
-      isDestroying: false,
-      heartbeatTimerId: null
+      live: null,
     }
   },
   beforeDestroy() {
@@ -87,9 +84,8 @@ export default {
           this.wsConnect()
         }
       } else {
-        if (this.websocket != null) {
-          this.isDestroying = true
-          this.websocket.close()
+        if (this.live != null) {
+          this.live.close()
         }
       }
       console.log('主APP：登录状态变更：' + oldValue + ' -> ' + newValue)
@@ -110,68 +106,28 @@ export default {
       }
       return false
     },
+    guid() {
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+        var r = Math.random() * 16 | 0,
+          v = c == 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+      });
+    },
     wsConnect() {
-      const url = `wss://danmu.loli.ren/chat`
-      //const url = `ws://localhost:23456/chat`
-      this.websocket = new WebSocket(url)
-      this.websocket.onopen = this.onWsOpen
-      this.websocket.onclose = this.onWsClose
-      this.websocket.onmessage = this.onWsMessage
-      this.heartbeatTimerId = window.setInterval(this.sendHeartbeat, 10 * 1000)
-    },
-    sendHeartbeat() {
-      this.websocket.send(JSON.stringify({
-        cmd: COMMAND_HEARTBEAT
-      }))
-    },
-    onWsOpen() {
-      this.retryCount = 0
-      this.websocket.send(JSON.stringify({
-        cmd: COMMAND_JOIN_ROOM,
-        data: {
-          roomId: parseInt(this.$store.state.roomInfo.roomId),
-          version: "9.9.9",
-          config: {
-            autoTranslate: false
-          }
-        }
-      }))
-    },
-    onWsClose() {
-      if (this.heartbeatTimerId) {
-        window.clearInterval(this.heartbeatTimerId)
-        this.heartbeatTimerId = null
-      }
-      if (this.isDestroying) {
-        return
-      }
-      window.console.log(`掉线重连中: ${++this.retryCount}`)
-      this.wsConnect()
-    },
-    onWsMessage(event) {
-      let { cmd, data } = JSON.parse(event.data)
-      //window.console.log(data)
-      if (data) {
-        if (data.id != 0) {
-          switch (cmd) {
-            case COMMAND_ADD_TEXT:
-              this.pushToDanmaku(data.authorName, 1, data.userId, data.content, data.timestamp, false, COMMAND_ADD_TEXT, data.id)
-              break
-            case COMMAND_ADD_GIFT:
-              this.pushToDanmaku(data.authorName, data.num, data.userId, data.giftName, data.timestamp, true, COMMAND_ADD_GIFT, data.id)
-              break
-            case COMMAND_ADD_FOLLOW:
-              this.pushToTTS(data.authorName, 1, data.userId, data.content, data.timestamp, false, COMMAND_ADD_FOLLOW, data.id)
-              break
-            case COMMAND_JOIN_ROOM:
-              this.pushToTTS(data.authorName, 1, data.userId, data.content, data.timestamp, false, COMMAND_JOIN_ROOM, data.id)
-              break
-            case COMMAND_ADD_JOIN_GROUP:
-              this.pushToTTS(data.authorName, 1, data.userId, data.content, data.timestamp, false, COMMAND_ADD_JOIN_GROUP, data.id)
-              break
-          }
-        }
-      }
+      this.live = new KeepLiveWS(parseInt(this.$store.state.roomInfo.roomId))
+      this.live.on('open', () => {
+        console.log('已连接直播弹幕服务器');
+        this.pushToDanmaku("助手", 1, 1, "已连接直播弹幕服务器", Date.now() / 1000, false, COMMAND_ADD_TEXT, this.guid())
+      });
+      this.live.on('live', () => {
+        this.pushToDanmaku("助手", 1, 1, "已连接直播间", Date.now() / 1000, false, COMMAND_ADD_TEXT, this.guid())
+      });
+      this.live.on('SEND_GIFT', ({ data: { uid, uname, action, giftName, num, face } }) => {
+        this.pushToDanmaku(uname, num, uid, giftName, Date.now() / 1000, true, COMMAND_ADD_GIFT, this.guid())
+      })
+      this.live.on('DANMU_MSG', ({ info: [, message, [uid, uname, isOwner /*, isVip, isSvip*/]] }) => {
+        this.pushToDanmaku(uname, 1, uid, message, Date.now() / 1000, false, COMMAND_ADD_TEXT, this.guid())
+      })
     },
     pushToDanmaku(name, num, uid, danmaku, timestamp, isGift, tid, id) {
       this.$store.state.roomInfo.danmakuList.unshift({
