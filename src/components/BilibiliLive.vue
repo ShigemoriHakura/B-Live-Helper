@@ -55,6 +55,11 @@
                   v-clipboard:success="onCopy">
                   复制推流码</v-btn>
                 <v-btn class="ma-2" elevation="2" color="error" @click="stopLive">关播</v-btn>
+                <br>
+                <v-btn class="ma-2" elevation="2" color="primary" @click="delayStopPush">延迟关闭直播</v-btn>
+                <v-btn class="ma-2" elevation="2" color="primary" v-clipboard:copy="livelink"
+                  v-clipboard:success="onCopy">
+                  复制直播间地址</v-btn>
               </v-col>
             </v-row>
           </v-tab-item>
@@ -194,11 +199,13 @@ export default {
     isStarting: false,
     //关播按钮等待
     isClosing: false,
+    livelink: "",
   }),
   beforeDestroy() {
     window.clearInterval(this.getLiveStatusTimer)
   },
   async created() {
+    this.livelink = this.getLiveLink();
 
     this.$store.watch((state) => state.config.isLogin, async (newValue, oldValue) => {
       console.log('直播组件：登录变更：' + oldValue + ' -> ' + newValue)
@@ -280,6 +287,9 @@ export default {
     window.clearInterval(this.getTranscodeInfoTimer)
   },
   methods: {
+    getLiveLink() {
+      return "https://live.bilibili.com/" + this.$store.state.roomInfo.roomId
+    },
     async replaceCover() {
       if (this.picId != 0 && this.picUrl != "" && this.picData != null && this.picData.audit_status == 1) {
         var csrfToken = this.getCsrf()
@@ -487,6 +497,14 @@ export default {
       } else {
         this.showSnackbar("CSRF获取失败，请检查更新")
       }
+    },
+    delayStopPush() {
+      this.showSnackbar("8秒后关播")
+      setTimeout(() => {
+        this.showSnackbar("关闭直播")
+        console.log("关闭直播")
+        this.stopLive()
+      }, 8000)
     },
     async setTitle() {
       var csrfToken = this.getCsrf()
