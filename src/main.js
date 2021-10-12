@@ -20,7 +20,7 @@ Vue.use(VueClipboard)
 Vue.use(Vuex)
 
 
-Vue.prototype.$version = "0.1.3"
+Vue.prototype.$version = "0.1.4"
 Vue.prototype.$BilibiliCommon = BilibiliCommon
 
 const store = new Vuex.Store({
@@ -47,6 +47,9 @@ const store = new Vuex.Store({
         onGift: "感谢 %s 送的 %n 个 %v",
         onJoin: "欢迎 %s 来到直播间",
         onFollow: "感谢 %s 的关注",
+        onGuard: "感谢 %s 的 %v",
+        onSuperChat: "感谢 %s 的留言 %v",
+        onJoinGuard: "欢迎舰长 %s 来到直播间",
       },
     },
     roomInfo: {

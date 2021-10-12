@@ -39,8 +39,12 @@ const COMMAND_HEARTBEAT = 0
 const COMMAND_JOIN_ROOM = 1
 const COMMAND_ADD_TEXT = 2
 const COMMAND_ADD_GIFT = 3
+const COMMAND_ADD_MEMBER = 4
+const COMMAND_ADD_SUPER_CHAT = 5
+const COMMAND_DEL_SUPER_CHAT = 6
 const COMMAND_ADD_FOLLOW = 10
 const COMMAND_ADD_JOIN_GROUP = 11
+const COMMAND_JOIN_ROOM_Guard = 12
 
 export default {
   name: 'App',
@@ -115,18 +119,47 @@ export default {
     },
     wsConnect() {
       this.live = new KeepLiveWS(parseInt(this.$store.state.roomInfo.roomId))
+      //this.live = new KeepLiveWS(22195814)
       this.live.on('open', () => {
         console.log('已连接直播弹幕服务器');
         this.pushToDanmaku("助手", 1, 1, "已连接直播弹幕服务器", Date.now() / 1000, false, COMMAND_ADD_TEXT, this.guid())
       });
+
       this.live.on('live', () => {
         this.pushToDanmaku("助手", 1, 1, "已连接直播间", Date.now() / 1000, false, COMMAND_ADD_TEXT, this.guid())
       });
+
+      //处理礼物
       this.live.on('SEND_GIFT', ({ data: { uid, uname, action, giftName, num, face } }) => {
         this.pushToDanmaku(uname, num, uid, giftName, Date.now() / 1000, true, COMMAND_ADD_GIFT, this.guid())
       })
+
+      //处理弹幕信息
       this.live.on('DANMU_MSG', ({ info: [, message, [uid, uname, isOwner /*, isVip, isSvip*/]] }) => {
         this.pushToDanmaku(uname, 1, uid, message, Date.now() / 1000, false, COMMAND_ADD_TEXT, this.guid())
+      })
+
+      //处理舰长
+      this.live.on('GUARD_BUY', ({ data: { uid, username, price, gift_name, num } }) => {
+        this.pushToDanmaku(username, num, uid, gift_name, Date.now() / 1000, false, COMMAND_ADD_MEMBER, this.guid())
+      })
+
+      //处理SC
+      this.live.on('SUPER_CHAT_MESSAGE', ({ data: { message, uid, user_info } }) => {
+        this.pushToDanmaku(user_info.uname, 1, uid, message, Date.now() / 1000, false, COMMAND_ADD_SUPER_CHAT, this.guid())
+      })
+
+      //处理欢迎
+      this.live.on('WELCOME', ({ data: { uid, uname } }) => {
+        this.pushToDanmaku(uname, 1, uid, "", Date.now() / 1000, false, COMMAND_JOIN_ROOM, this.guid())
+      })
+
+      //处理欢迎舰长
+      this.live.on('WELCOME_GUARD', ({ data: { uid, username } }) => {
+        this.pushToDanmaku(username, 1, uid, "", Date.now() / 1000, false, COMMAND_JOIN_ROOM_Guard, this.guid())
+      })
+      this.live.on('ENTRY_EFFECT', ({ data: { uid, uname, copy_writing } }) => {
+        this.pushToDanmaku("/", 1, uid, copy_writing, Date.now() / 1000, false, COMMAND_JOIN_ROOM_Guard, this.guid())
       })
     },
     pushToDanmaku(name, num, uid, danmaku, timestamp, isGift, tid, id) {

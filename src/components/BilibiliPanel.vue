@@ -93,11 +93,16 @@ import yaml from "js-yaml"
 import { version } from 'js-base64'
 import DanmakuTTS from '@/components/Mate/DanmakuTTS.vue'
 
+const COMMAND_HEARTBEAT = 0
 const COMMAND_JOIN_ROOM = 1
 const COMMAND_ADD_TEXT = 2
 const COMMAND_ADD_GIFT = 3
+const COMMAND_ADD_MEMBER = 4
+const COMMAND_ADD_SUPER_CHAT = 5
+const COMMAND_DEL_SUPER_CHAT = 6
 const COMMAND_ADD_FOLLOW = 10
 const COMMAND_ADD_JOIN_GROUP = 11
+const COMMAND_JOIN_ROOM_Guard = 12
 
 export default {
   name: 'BilibiliPanel',
@@ -238,9 +243,9 @@ export default {
                 u.play()
               }
               break
-            case COMMAND_ADD_JOIN_GROUP:
-              if (this.$store.state.TTSInfo.TTSLang.onJoinClub != "") {
-                var text = this.getFormatedText(danmaku, this.$store.state.TTSInfo.TTSLang.onJoinClub)
+            case COMMAND_ADD_MEMBER:
+              if (this.$store.state.TTSInfo.TTSLang.onGuard != "") {
+                var text = this.getFormatedText(danmaku, this.$store.state.TTSInfo.TTSLang.onGuard)
                 var url = `https://tts.baidu.com/text2audio?lan=ZH&cuid=baike&pdt=301&ctp=1&spd=` + this.$store.state.TTSInfo.TTSspeed + `&per=` + this.$store.state.TTSInfo.TTSperson + `&vol=` + this.$store.state.TTSInfo.TTSvolume + `&pit=` + this.$store.state.TTSInfo.TTSpitch + `&tex=` + encodeURI(text)
                 var u = new Audio(url)
                 u.src = url
@@ -252,6 +257,35 @@ export default {
                 u.play()
               }
               break
+            case COMMAND_ADD_SUPER_CHAT:
+              if (this.$store.state.TTSInfo.TTSLang.onSuperChat != "") {
+                var text = this.getFormatedText(danmaku, this.$store.state.TTSInfo.TTSLang.onSuperChat)
+                var url = `https://tts.baidu.com/text2audio?lan=ZH&cuid=baike&pdt=301&ctp=1&spd=` + this.$store.state.TTSInfo.TTSspeed + `&per=` + this.$store.state.TTSInfo.TTSperson + `&vol=` + this.$store.state.TTSInfo.TTSvolume + `&pit=` + this.$store.state.TTSInfo.TTSpitch + `&tex=` + encodeURI(text)
+                var u = new Audio(url)
+                u.src = url
+                u.addEventListener('play', () => {
+                  setTimeout(() => {
+                    this.TTSTimer = window.setInterval(this.processTTSQueue, u.duration * 1000)
+                  }, 800)
+                });
+                u.play()
+              }
+              break
+            case COMMAND_JOIN_ROOM_Guard:
+              if (this.$store.state.TTSInfo.TTSLang.onJoinGuard != "") {
+                var text = this.getFormatedText(danmaku, this.$store.state.TTSInfo.TTSLang.onJoinGuard)
+                var url = `https://tts.baidu.com/text2audio?lan=ZH&cuid=baike&pdt=301&ctp=1&spd=` + this.$store.state.TTSInfo.TTSspeed + `&per=` + this.$store.state.TTSInfo.TTSperson + `&vol=` + this.$store.state.TTSInfo.TTSvolume + `&pit=` + this.$store.state.TTSInfo.TTSpitch + `&tex=` + encodeURI(text)
+                var u = new Audio(url)
+                u.src = url
+                u.addEventListener('play', () => {
+                  setTimeout(() => {
+                    this.TTSTimer = window.setInterval(this.processTTSQueue, u.duration * 1000)
+                  }, 800)
+                });
+                u.play()
+              }
+              break
+
           }
         }
       } else {

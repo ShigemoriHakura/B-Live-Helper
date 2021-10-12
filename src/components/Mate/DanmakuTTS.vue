@@ -27,6 +27,12 @@
         </v-text-field>
         <v-text-field v-model="$store.state.TTSInfo.TTSLang.onFollow" placeholder="感谢 %s 的关注" label="关注播报句式">
         </v-text-field>
+        <v-text-field v-model="$store.state.TTSInfo.TTSLang.onGuard" placeholder="感谢 %s 的 %v" label="大航海句式">
+        </v-text-field>
+        <v-text-field v-model="$store.state.TTSInfo.TTSLang.onSuperChat" placeholder="感谢 %s 的留言 %v" label="SC播报句式">
+        </v-text-field>
+        <v-text-field v-model="$store.state.TTSInfo.TTSLang.onJoinGuard" placeholder="欢迎舰长 %s 来到直播间" label="舰长前来播报句式">
+        </v-text-field>
         %s: 发送者<br>
         %n: 礼物数量<br>
         %v: 赠送内容 <br>
