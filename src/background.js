@@ -8,6 +8,7 @@ const isDevelopment = process.env.NODE_ENV !== 'production'
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let win
+let tray
 
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([
@@ -48,6 +49,26 @@ function createWindow() {
     app.quit()
   })
 }
+
+app.whenReady().then(() => {
+  tray = new Tray('/path/to/my/icon')
+  const contextMenu = Menu.buildFromTemplate([
+    { label: '显示主界面', click: () => {
+      appTray.destroy()
+      win.show()
+    }},
+    { label: '退出', click: () => app.quit() }
+  ])
+  tray.setToolTip('B-LIVE-HELPER')
+  tray.setContextMenu(contextMenu)
+})
+
+tray.on('click', () => {
+  // 显示主程序
+  win.show();
+  // 关闭托盘显示
+  appTray.destroy();
+});
 
 // Quit when all windows are closed.
 app.on('window-all-closed', () => {
