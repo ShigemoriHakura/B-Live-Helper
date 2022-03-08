@@ -51,11 +51,12 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
-  tray = new Tray('/path/to/my/icon')
+  icon = path.join(__static, 'favicon.ico')
+  tray = new Tray(icon)
   const contextMenu = Menu.buildFromTemplate([
     { label: '显示主界面', click: () => {
       appTray.destroy()
-      win.show()
+      win..show()
     }},
     { label: '退出', click: () => app.quit() }
   ])
