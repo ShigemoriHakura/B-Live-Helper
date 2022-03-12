@@ -28,6 +28,7 @@
                 </v-select>
                 <v-select v-model="concreteId" :items="concrete" item-text="name" item-value="id" label="具体"></v-select>
                 <v-btn class="ma-2" elevation="2" color="error" @click="startLive">开播</v-btn>
+                <v-btn class="ma-2" elevation="2" color="warning" @click="receiveReward">领取主播任务奖励</v-btn>
               </v-col>
             </v-row>
           </v-tab-item>
@@ -60,6 +61,7 @@
                 <v-btn class="ma-2" elevation="2" color="primary" v-clipboard:copy="livelink"
                   v-clipboard:success="onCopy">
                   复制直播间地址</v-btn>
+                <v-btn class="ma-2" elevation="2" color="warning" @click="receiveReward">领取主播任务奖励</v-btn>
               </v-col>
             </v-row>
           </v-tab-item>
@@ -289,6 +291,25 @@ export default {
   methods: {
     getLiveLink() {
       return "https://live.bilibili.com/" + this.$store.state.roomInfo.roomId
+    },
+    async receiveReward() {
+      var csrfToken = this.getCsrf()
+      if (csrfToken != "") {
+        var res = await this.$BilibiliCommon.getHTTPResult(
+          "https://api.live.bilibili.com/xlive/activity-interface/v2/anchor_task_center/receive_reward",
+          "https://link.bilibili.com",
+          this.$store.state.BilibiliCommonCache.cookies,
+          {}
+        )
+        var resJson = JSON.parse(res.body)
+        if (resJson.code == 0) {
+          this.showSnackbar("领取成功，返回：" + res.body)
+        } else {
+          this.showSnackbar("领取失败，请检查更新")
+        }
+      } else {
+        this.showSnackbar("CSRF获取失败，请检查更新")
+      }
     },
     async replaceCover() {
       if (this.picId != 0 && this.picUrl != "" && this.picData != null && this.picData.audit_status == 1) {

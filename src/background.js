@@ -1,6 +1,6 @@
 'use strict'
 import path from 'path'
-import { app, protocol, BrowserWindow, Menu } from 'electron'
+import { app, protocol, BrowserWindow, Menu, Tray } from 'electron'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
 const isDevelopment = process.env.NODE_ENV !== 'production'
@@ -9,6 +9,7 @@ const isDevelopment = process.env.NODE_ENV !== 'production'
 // be closed automatically when the JavaScript object is garbage collected.
 let win
 let tray
+let icon
 
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([
@@ -53,23 +54,24 @@ function createWindow() {
 app.whenReady().then(() => {
   icon = path.join(__static, 'favicon.ico')
   tray = new Tray(icon)
+  tray.on('click', () => {
+    // 显示主程序
+    win.show()
+    // 关闭托盘显示
+    appTray.destroy()
+  });
   const contextMenu = Menu.buildFromTemplate([
-    { label: '显示主界面', click: () => {
-      appTray.destroy()
-      win..show()
-    }},
+    {
+      label: '显示主界面', click: () => {
+        appTray.destroy()
+        win.show()
+      }
+    },
     { label: '退出', click: () => app.quit() }
   ])
   tray.setToolTip('B-LIVE-HELPER')
   tray.setContextMenu(contextMenu)
 })
-
-tray.on('click', () => {
-  // 显示主程序
-  win.show();
-  // 关闭托盘显示
-  appTray.destroy();
-});
 
 // Quit when all windows are closed.
 app.on('window-all-closed', () => {

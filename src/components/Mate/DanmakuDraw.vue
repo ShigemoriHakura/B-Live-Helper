@@ -90,9 +90,15 @@ export default {
     }
   },
   async created() {
-    const url = `https://acmate.loli.ren/api/gifts`
+    const url = `https://api.live.bilibili.com/xlive/web-room/v1/giftPanel/giftConfig?platform=pc`
     var datagifts = (await axios.get(url)).data
-    this.availableGifts = datagifts.data
+    if (datagifts.code == 0) {
+      var datacache = []
+      datagifts.data.list.forEach(element => {
+        datacache.push(element.name)
+      });
+      this.availableGifts = datacache
+    }
 
     this.$store.watch((state) => state.roomInfo.danmakuList, async (newValue, oldValue) => {
       var danmaku = newValue[0]

@@ -9,8 +9,6 @@
   -webkit-box-sizing: border-box;
           box-sizing: border-box;
   -webkit-app-region: drag;
-  z-index: 5000;
-  background-color: white;
   z-index: 5000000;
   background-color: #0A0F34;
 }
@@ -30,7 +28,7 @@
   text-align: left;
   font-size: 12px;
   text-transform: lowercase;
-  color: white;
+  color:  transparent !important;
 }
 
 .window-chrome .window-controls {
@@ -120,7 +118,7 @@ body {
   margin: 0;
   padding: 0px;
   font-family: "Open Sans", sans-serif;
-  background-color: rgba(0, 0, 30, 0.15);
+  background-color: rgba(0, 0, 0, 0);
   overflow: hidden;
   opacity: 0.95;
   -webkit-font-smoothing: antialiased !important;
@@ -134,7 +132,7 @@ body {
   height: calc(100vh - 80px) !important;
   margin-top: 32px;
   z-index: 5;
-  background-color: white;
+  background-color:  transparent !important;
 }
 
 #browserView.full-size {
@@ -148,7 +146,6 @@ body {
   display: flex;
   position: fixed;
   z-index: 1000000;
-  background-color: #1167f1;
   background-color: #0A0F34;
   -webkit-box-sizing: border-box;
           box-sizing: border-box;
@@ -210,7 +207,6 @@ body {
   border: none;
   border-radius: 2px;
   color: white;
-  background-color: transparent;
   background-color: rgba(255, 255, 255, 0.1);
 }
 

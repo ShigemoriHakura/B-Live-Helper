@@ -13,7 +13,7 @@
     </div>
 
     <webview id="browserView" src="_blank"
-      style="background-color: rgba(0, 0, 0, 0)!important;display:inline-flex; width:100%;"></webview>
+      style="background-color: transparent!important;display:inline-flex; width:100%;"></webview>
   </div>
 </template>
 
@@ -37,11 +37,12 @@ export default {
     async loadPage(url) {
       console.log("Loading " + url);
       var webview = document.getElementById('browserView')
-      const res = await got("https://b-helper.oss-cn-shanghai.aliyuncs.com/BLiveHelper/css/danmakuStyle.css", {
+      const res = await got("https://b-helper.oss-cn-shanghai.aliyuncs.com/BLiveHelper/css/danmakuStyle20222.css", {
         method: "GET",
       })
       webview.addEventListener('dom-ready', function () {
         webview.insertCSS(res.body);
+        console.log("Inderted");
       })
       webview.loadURL(url);
     },

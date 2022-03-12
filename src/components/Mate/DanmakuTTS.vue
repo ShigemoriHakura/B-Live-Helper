@@ -23,16 +23,16 @@
         </v-text-field>
         <v-text-field v-model="$store.state.TTSInfo.TTSLang.onGift" placeholder="感谢 %s 送的 %n 个 %v" label="礼物播报句式">
         </v-text-field>
-        <v-text-field v-model="$store.state.TTSInfo.TTSLang.onJoin" placeholder="欢迎 %s 来到直播间" label="欢迎播报句式">
+        <!--<v-text-field v-model="$store.state.TTSInfo.TTSLang.onJoin" placeholder="欢迎 %s 来到直播间" label="欢迎播报句式">
         </v-text-field>
         <v-text-field v-model="$store.state.TTSInfo.TTSLang.onFollow" placeholder="感谢 %s 的关注" label="关注播报句式">
-        </v-text-field>
+        </v-text-field>-->
         <v-text-field v-model="$store.state.TTSInfo.TTSLang.onGuard" placeholder="感谢 %s 的 %v" label="大航海句式">
         </v-text-field>
         <v-text-field v-model="$store.state.TTSInfo.TTSLang.onSuperChat" placeholder="感谢 %s 的留言 %v" label="SC播报句式">
         </v-text-field>
-        <v-text-field v-model="$store.state.TTSInfo.TTSLang.onJoinGuard" placeholder="欢迎舰长 %s 来到直播间" label="舰长前来播报句式">
-        </v-text-field>
+        <!--<v-text-field v-model="$store.state.TTSInfo.TTSLang.onJoinGuard" placeholder="欢迎舰长 %s 来到直播间" label="舰长前来播报句式">
+        </v-text-field>-->
         %s: 发送者<br>
         %n: 礼物数量<br>
         %v: 赠送内容 <br>
@@ -60,23 +60,8 @@ export default {
           name: "度逍遥（基础）",
           id: 3,
         }, {
-          name: "度逍遥（精品）",
-          id: 5003,
-        }, {
-          name: "度丫丫",
-          id: 4,
-        }, {
-          name: "度小鹿",
-          id: 5118,
-        }, {
           name: "度博文",
           id: 106,
-        }, {
-          name: "度小童",
-          id: 110,
-        }, {
-          name: "度小萌",
-          id: 111,
         }, {
           name: "度米朵",
           id: 103,

@@ -119,7 +119,7 @@ export default {
     },
     wsConnect() {
       this.live = new KeepLiveWS(parseInt(this.$store.state.roomInfo.roomId))
-      //this.live = new KeepLiveWS(22195814)
+      //this.live = new KeepLiveWS(21533891)
       this.live.on('open', () => {
         console.log('已连接直播弹幕服务器');
         this.pushToDanmaku("助手", 1, 1, "已连接直播弹幕服务器", Date.now() / 1000, false, COMMAND_ADD_TEXT, this.guid())
@@ -148,19 +148,19 @@ export default {
       this.live.on('SUPER_CHAT_MESSAGE', ({ data: { message, uid, user_info } }) => {
         this.pushToDanmaku(user_info.uname, 1, uid, message, Date.now() / 1000, false, COMMAND_ADD_SUPER_CHAT, this.guid())
       })
-
-      //处理欢迎
-      this.live.on('WELCOME', ({ data: { uid, uname } }) => {
-        this.pushToDanmaku(uname, 1, uid, "", Date.now() / 1000, false, COMMAND_JOIN_ROOM, this.guid())
-      })
-
-      //处理欢迎舰长
-      this.live.on('WELCOME_GUARD', ({ data: { uid, username } }) => {
-        this.pushToDanmaku(username, 1, uid, "", Date.now() / 1000, false, COMMAND_JOIN_ROOM_Guard, this.guid())
-      })
-      this.live.on('ENTRY_EFFECT', ({ data: { uid, uname, copy_writing } }) => {
-        this.pushToDanmaku("/", 1, uid, copy_writing, Date.now() / 1000, false, COMMAND_JOIN_ROOM_Guard, this.guid())
-      })
+      /*
+            //处理欢迎
+            this.live.on('WELCOME', ({ data: { uid, uname } }) => {
+              this.pushToDanmaku(uname, 1, uid, "", Date.now() / 1000, false, COMMAND_JOIN_ROOM, this.guid())
+            })
+            //处理欢迎舰长
+            this.live.on('WELCOME_GUARD', ({ data: { uid, username } }) => {
+              this.pushToDanmaku(username, 1, uid, "", Date.now() / 1000, false, COMMAND_JOIN_ROOM_Guard, this.guid())
+            })
+            this.live.on('ENTRY_EFFECT', ({ data: { uid, uname, copy_writing } }) => {
+              this.pushToDanmaku("/", 1, uid, copy_writing, Date.now() / 1000, false, COMMAND_JOIN_ROOM_Guard, this.guid())
+            })
+      */
     },
     pushToDanmaku(name, num, uid, danmaku, timestamp, isGift, tid, id) {
       this.$store.state.roomInfo.danmakuList.unshift({
