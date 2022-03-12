@@ -293,6 +293,7 @@ export default {
       return "https://live.bilibili.com/" + this.$store.state.roomInfo.roomId
     },
     async receiveReward() {
+      //https://api.live.bilibili.com/xlive/activity-interface/v2/anchor_task_center/task_info 任务列表
       var csrfToken = this.getCsrf()
       if (csrfToken != "") {
         var res = await this.$BilibiliCommon.getHTTPResult(
