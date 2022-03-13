@@ -10,11 +10,45 @@ const isDevelopment = process.env.NODE_ENV !== 'production'
 let win
 let tray
 let icon
+let menuTemplate = []
 
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([
-  { scheme: 'app', privileges: { secure: true, standard: true } }
+  { scheme: 'B-live-helper', privileges: { secure: true, standard: true } }
 ])
+
+function makeTray() {
+  if (tray !== undefined)
+    tray.destroy()
+  icon = path.join(__static, 'favicon.ico')
+  tray = new Tray(icon)
+  tray.on('click', () => {
+    win.show()
+  });
+  if (win.isVisible()) {
+    menuTemplate = ([
+      {
+        label: '隐藏主界面', click: () => {
+          win.hide()
+          makeTray()
+        }
+      },
+      { label: '退出', click: () => app.exit() }])
+  }
+  else {
+    menuTemplate = ([
+      {
+        label: '显示主界面', click: () => {
+          win.show()
+          makeTray()
+        }
+      },
+      { label: '退出', click: () => app.exit() }])
+  }
+  const contextMenu = Menu.buildFromTemplate(menuTemplate)
+  tray.setToolTip('B-LIVE-HELPER')
+  tray.setContextMenu(contextMenu)
+}
 
 function createWindow() {
   // Create the browser window.
@@ -47,31 +81,8 @@ function createWindow() {
 
   win.on('closed', () => {
     win = null
-    app.quit()
   })
 }
-
-app.whenReady().then(() => {
-  icon = path.join(__static, 'favicon.ico')
-  tray = new Tray(icon)
-  tray.on('click', () => {
-    // 显示主程序
-    win.show()
-    // 关闭托盘显示
-    appTray.destroy()
-  });
-  const contextMenu = Menu.buildFromTemplate([
-    {
-      label: '显示主界面', click: () => {
-        appTray.destroy()
-        win.show()
-      }
-    },
-    { label: '退出', click: () => app.quit() }
-  ])
-  tray.setToolTip('B-LIVE-HELPER')
-  tray.setContextMenu(contextMenu)
-})
 
 // Quit when all windows are closed.
 app.on('window-all-closed', () => {
@@ -103,6 +114,13 @@ app.on('ready', async () => {
     }
   }
   createWindow()
+  makeTray()
+  win.on('close', (e) => {
+    e.preventDefault()
+    win.hide()
+    win.setSkipTaskbar(true)
+    makeTray()
+  })
 })
 
 // Exit cleanly on request from parent process in development mode.

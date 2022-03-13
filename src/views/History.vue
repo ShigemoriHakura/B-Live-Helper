@@ -18,6 +18,10 @@
               </thead>
               <tbody>
                 <tr>
+                  <td>0.1.5</td>
+                  <td>部分错误修复。</td>
+                </tr>
+                <tr>
                   <td>0.1.4</td>
                   <td>部分错误修复。</td>
                 </tr>

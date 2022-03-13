@@ -30,6 +30,9 @@
         <v-tab>
           弹幕播报
         </v-tab>
+        <!--<v-tab>
+          词云
+        </v-tab>-->
         <v-tab-item>
           <v-row>
             <v-col cols="12" md="12">
@@ -78,6 +81,8 @@
         <v-tab-item>
           <DanmakuTTS />
         </v-tab-item>
+        <!--<v-tab-item>
+        </v-tab-item>-->
       </v-tabs>
     </v-container>
   </v-container>
