@@ -1,6 +1,6 @@
 {
   "name": "blivehelper",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "author": "Hakura",
   "description": "A helper for bilibili live",
   "private": true,
@@ -18,6 +18,8 @@
     "@mdi/font": "^3.6.95",
     "axios": "^0.21.0",
     "bilibili-live-ws": "^5.1.1",
+    "echarts": "^5.3.1",
+    "echarts-wordcloud": "^2.0.0",
     "electron-config": "^2.0.0",
     "form-data": "^3.0.0",
     "got": "^11.8.1",

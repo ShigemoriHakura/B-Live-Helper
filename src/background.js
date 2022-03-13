@@ -2,7 +2,7 @@
 import path from 'path'
 import { app, protocol, BrowserWindow, Menu, Tray } from 'electron'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
-import installExtension, { VUEJS3_DEVTOOLS } from 'electron-devtools-installer'
+import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
 // Keep a global reference of the window object, if you don't, the window will
@@ -17,15 +17,15 @@ protocol.registerSchemesAsPrivileged([
   { scheme: 'B-live-helper', privileges: { secure: true, standard: true } }
 ])
 
-function makeTray(){
-  if(tray !== undefined)
+function makeTray() {
+  if (tray !== undefined)
     tray.destroy()
   icon = path.join(__static, 'favicon.ico')
   tray = new Tray(icon)
   tray.on('click', () => {
     win.show()
   });
-  if(win.isVisible()){
+  if (win.isVisible()) {
     menuTemplate = ([
       {
         label: '隐藏主界面', click: () => {
@@ -35,12 +35,12 @@ function makeTray(){
       },
       { label: '退出', click: () => app.exit() }])
   }
-  else{
+  else {
     menuTemplate = ([
       {
         label: '显示主界面', click: () => {
-         win.show()
-         makeTray()
+          win.show()
+          makeTray()
         }
       },
       { label: '退出', click: () => app.exit() }])
