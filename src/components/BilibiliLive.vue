@@ -21,6 +21,9 @@
           <v-tab v-if="!$store.state.liveInfo.isLive">
             OBS控制
           </v-tab>
+          <v-tab>
+            主播任务
+          </v-tab>
           <v-tab-item v-if="!$store.state.liveInfo.isLive">
             <v-row>
               <v-col cols="12" md="12">
@@ -29,6 +32,7 @@
                 <v-select v-model="concreteId" :items="concrete" item-text="name" item-value="id" label="具体"></v-select>
                 <v-btn class="ma-2" elevation="2" color="error" @click="startLive">开播</v-btn>
                 <v-btn class="ma-2" elevation="2" color="warning" @click="receiveReward">领取主播任务奖励</v-btn>
+                <v-btn class="ma-2" elevation="2" color="warning" @click="refreshLiveTask">刷新主播任务</v-btn>
               </v-col>
             </v-row>
           </v-tab-item>
@@ -62,6 +66,7 @@
                   v-clipboard:success="onCopy">
                   复制直播间地址</v-btn>
                 <v-btn class="ma-2" elevation="2" color="warning" @click="receiveReward">领取主播任务奖励</v-btn>
+                <v-btn class="ma-2" elevation="2" color="warning" @click="refreshLiveTask">刷新主播任务</v-btn>
               </v-col>
             </v-row>
           </v-tab-item>
@@ -134,6 +139,8 @@
             <v-row>
               <v-col cols="12" md="12">
                 请注意先打开OBS再打开助手<br>
+                <p v-if="$store.state.obsInfo.obsEnabled">已启用</p>
+                <p v-if="!$store.state.obsInfo.obsEnabled">未启用</p>
                 <v-text-field v-model="$store.state.obsInfo.obsPort" type="number" label="OBS控制端口"></v-text-field>
                 <v-text-field v-model="$store.state.obsInfo.obsPass" type="text" label="OBS控制密码"></v-text-field>
                 <v-switch v-model="$store.state.obsInfo.obsStartStreamingAfterStart"
@@ -145,7 +152,7 @@
               </v-col>
               <v-col cols="12" md="12">
                 设置教程：<br>
-                0.检查OBS版本是否大于25或以上<br>
+                0.检查OBS版本是否大于28或以上<br>
                 1.安装OBS控制插件（<v-btn class="ma-2" @click="downloadOBSWS" elevation="2" color="success">点我下载</v-btn>）<br>
                 2.设置密码和端口，注意关闭“启用系统托盘通知”，不然会出现很多连接和断开的通知提醒。<br>
                 3.将端口和密码写入上方对应栏目中<br>
@@ -156,6 +163,126 @@
                 <v-img width="458px" height="263px" src="@/assets/img/obs/P1.png"></v-img>
               </v-col>
             </v-row>
+          </v-tab-item>
+          <v-tab-item>
+            <v-simple-table>
+              <template v-slot:default>
+                <thead>
+                  <tr>
+                    <th class="text-left">
+                      主任务名
+                    </th>
+                    <th class="text-left">
+                      子任务内容
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="item in anchorTask" :key="item.taskGroupId">
+                    <td>{{ item.title }}</td>
+                    <td style="width: 100% !important;">
+                      <v-simple-table style="width: 120% !important;">
+                        <template v-slot:default>
+                          <thead>
+                            <tr>
+                              <th class="text-left">
+                                任务名
+                              </th>
+                              <th class="text-left">
+                                大任务ID
+                              </th>
+                              <th class="text-left">
+                                任务内容
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr v-for="taskInfoItem in item.taskInfo" :key="taskInfoItem.taskId">
+                              <td>{{ taskInfoItem.title }}</td>
+                              <td>{{ taskInfoItem.taskId }}</td>
+                              <td style="width: 100% !important;">
+                                <v-simple-table style="width: 100% !important;">
+                                  <template v-slot:default>
+                                    <thead>
+                                      <tr>
+                                        <th class="text-left">
+                                          子任务信息
+                                        </th>
+                                        <th class="text-left">
+                                          子任务奖励
+                                        </th>
+                                      </tr>
+                                    </thead>
+                                    <tbody>
+                                      <tr v-for="subTaskLevelInfoItem in taskInfoItem.subTaskLevelInfo" :key="subTaskLevelInfoItem.subTaskLevel">
+                                        <td style="width: 100% !important;">
+                                          <v-simple-table style="width: 300px !important;">
+                                            <template v-slot:default>
+                                              <thead>
+                                                <tr>
+                                                  <th class="text-left">
+                                                    子任务ID
+                                                  </th>
+                                                  <th class="text-left">
+                                                    子任务内容
+                                                  </th>
+                                                  <th class="text-left">
+                                                    子任务目标
+                                                  </th>
+                                                  <th class="text-left">
+                                                    子任务进度
+                                                  </th>
+                                                </tr>
+                                              </thead>
+                                              <tbody>
+                                                <tr v-for="subTaskInfoItem in subTaskLevelInfoItem.subTaskInfo" :key="subTaskInfoItem.subTaskId">
+                                                  <td>{{ subTaskInfoItem.subTaskId }}</td>
+                                                  <td>{{ subTaskInfoItem.subTaskType | checkSubTaskType }}</td>
+                                                  <td>{{ subTaskInfoItem.targetNum }}</td>
+                                                  <td>{{ subTaskInfoItem.currentNum }}</td>
+                                                </tr>
+                                              </tbody>
+                                            </template>
+                                          </v-simple-table>
+                                        </td>
+                                        <td style="width: 100% !important;">
+                                          <v-simple-table style="width: 150px !important;">
+                                            <template v-slot:default>
+                                              <thead>
+                                                <tr>
+                                                  <th class="text-left">
+                                                    奖励类型
+                                                  </th>
+                                                  <th class="text-left">
+                                                    奖励内容
+                                                  </th>
+                                                </tr>
+                                              </thead>
+                                              <tbody>
+                                                <tr v-for="rewardInfoItem in subTaskLevelInfoItem.rewardInfo" :key="rewardInfoItem.rewardType">
+                                                  <td>{{ rewardInfoItem.rewardType }}</td>
+                                                  <td>{{ rewardInfoItem.rewardNum }} {{ rewardInfoItem.rewardName }}</td>
+                                                </tr>
+                                              </tbody>
+                                            </template>
+                                          </v-simple-table>
+                                        </td>
+                                      </tr>
+                                    </tbody>
+                                  </template>
+                                </v-simple-table>
+                              </td>
+                              <td>{{ taskInfoItem.targetNum }}</td>
+                              <td>{{ taskInfoItem.currentNum }}</td>
+                            </tr>
+                          </tbody>
+                        </template>
+                      </v-simple-table>
+                    </td>
+                  </tr>
+                </tbody>
+              </template>
+            </v-simple-table>
           </v-tab-item>
         </v-tabs>
       </v-container>
@@ -202,6 +329,8 @@ export default {
     //关播按钮等待
     isClosing: false,
     livelink: "",
+
+    anchorTask: {}
   }),
   beforeDestroy() {
     window.clearInterval(this.getLiveStatusTimer)
@@ -236,6 +365,7 @@ export default {
       await this.getLiveCovers()
     }
 
+    this.refreshLiveTask()
     this.getLiveStatusTimer = window.setInterval(this.getLiveStatus, 2 * 1000)
   },
   watch: {
@@ -275,6 +405,16 @@ export default {
       let date = new Date(time)
       return formatDate(date, 'yyyy-MM-dd hh:mm')
     },
+    checkSubTaskType(type){
+      switch (type){
+        case 2:
+          return "分享直播间";
+        case 16:
+          return "去连麦";
+        default:
+          return "暂时未知：" + type;
+      }
+    },
     getPhotoType(type) {
       switch (type) {
         case "Normal":
@@ -293,10 +433,10 @@ export default {
       return "https://live.bilibili.com/" + this.$store.state.roomInfo.roomId
     },
     async receiveReward() {
-      //https://api.live.bilibili.com/xlive/activity-interface/v2/anchor_task_center/task_info 任务列表
       var csrfToken = this.getCsrf()
       if (csrfToken != "") {
         var res = await this.$BilibiliCommon.getHTTPResult(
+          this, 
           "https://api.live.bilibili.com/xlive/activity-interface/v2/anchor_task_center/receive_reward",
           "https://link.bilibili.com",
           this.$store.state.BilibiliCommonCache.cookies,
@@ -317,6 +457,7 @@ export default {
         var csrfToken = this.getCsrf()
         if (csrfToken != "") {
           var res = await this.$BilibiliCommon.postHTTPResult(
+            this, 
             "https://api.live.bilibili.com/room/v1/Cover/update",
             "https://link.bilibili.com",
             this.$store.state.BilibiliCommonCache.cookies,
@@ -353,6 +494,7 @@ export default {
           form.append('file', decodedFile, { filename: 'blob' });
 
           var res = await this.$BilibiliCommon.postHTTPFormData(
+            this, 
             "https://api.bilibili.com/x/upload/web/image?csrf=" + csrfToken,
             "https://link.bilibili.com",
             this.$store.state.BilibiliCommonCache.cookies,
@@ -362,6 +504,7 @@ export default {
           console.log(resJson)
           if (resJson.code == 0) {
             var res = await this.$BilibiliCommon.postHTTPResult(
+              this, 
               "https://api.live.bilibili.com/room/v1/Cover/replace",
               "https://link.bilibili.com",
               this.$store.state.BilibiliCommonCache.cookies,
@@ -393,6 +536,7 @@ export default {
     },
     async getLiveCovers() {
       var res = await this.$BilibiliCommon.getHTTPResult(
+        this, 
         "https://api.live.bilibili.com/room/v1/Cover/get_list?room_id=" + this.$store.state.roomInfo.roomId + "&type=all_cover",
         "https://link.bilibili.com",
         this.$store.state.BilibiliCommonCache.cookies,
@@ -410,6 +554,7 @@ export default {
     },
     async getLiveType() {
       var res = await this.$BilibiliCommon.getHTTPResult(
+        this, 
         "https://api.live.bilibili.com/room/v1/Area/getList?show_pinyin=1",
         "https://link.bilibili.com",
         this.$store.state.BilibiliCommonCache.cookies,
@@ -422,6 +567,28 @@ export default {
         this.concreteId = this.$store.state.liveInfo.liveConcreteId
       }
     },
+    async refreshLiveTask(){
+      var csrfToken = this.getCsrf()
+      if (csrfToken != "") {
+        var res = await this.$BilibiliCommon.getHTTPResult(
+          this, 
+          "https://api.live.bilibili.com/xlive/anchor-task-interface/api/v1/GetAnchorTaskCenterInfo",
+          "",
+          this.$store.state.BilibiliCommonCache.cookies,
+          {}
+        )
+        var resJson = JSON.parse(res.body)
+        console.log(resJson)
+        if (resJson.code == 0) {
+          this.showSnackbar("刷新成功")
+          this.anchorTask = resJson.data.taskGroups
+        } else {
+          this.showSnackbar("刷新失败，请检查更新")
+        }
+      } else {
+        this.showSnackbar("CSRF获取失败，请检查更新")
+      }
+    },
     async startLive() {
       if (!this.isStarting) {
         this.isStarting = true
@@ -430,6 +597,7 @@ export default {
         this.$BilibiliCommon.saveNewData(this)
         if (this.checkcategoryConcrete()) {
           await this.getLiveStreamKeyAndUrl()
+          this.refreshLiveTask()
         } else {
           this.showSnackbar("请设置分区")
         }
@@ -442,6 +610,7 @@ export default {
       var csrfToken = this.getCsrf()
       if (csrfToken != "") {
         var res = await this.$BilibiliCommon.postHTTPResult(
+          this, 
           "https://api.live.bilibili.com/room/v1/Room/startLive",
           "https://link.bilibili.com",
           this.$store.state.BilibiliCommonCache.cookies,
@@ -498,6 +667,7 @@ export default {
       var csrfToken = this.getCsrf()
       if (csrfToken != "") {
         var res = await this.$BilibiliCommon.postHTTPResult(
+          this, 
           "https://api.live.bilibili.com/room/v1/Room/stopLive",
           "https://link.bilibili.com",
           this.$store.state.BilibiliCommonCache.cookies,
@@ -532,6 +702,7 @@ export default {
       var csrfToken = this.getCsrf()
       if (csrfToken != "") {
         var res = await this.$BilibiliCommon.postHTTPResult(
+          this, 
           "https://api.live.bilibili.com/room/v1/Room/update",
           "https://link.bilibili.com",
           this.$store.state.BilibiliCommonCache.cookies,
@@ -556,6 +727,7 @@ export default {
     async getLiveStatus() {
       if (this.$store.state.config.isLogin) {
         var res = await this.$BilibiliCommon.getHTTPResult(
+          this, 
           "https://api.live.bilibili.com/xlive/web-room/v1/index/getRoomBaseInfo?room_ids=" + this.$store.state.roomInfo.roomId + "&req_biz=link-center",
           "https://link.bilibili.com",
           this.$store.state.BilibiliCommonCache.cookies,
@@ -584,11 +756,11 @@ export default {
     testOBSWS() {
       if (this.$store.state.obsInfo.obsPort != 0 && this.$store.state.obsInfo.obsPort != undefined) {
         const obs = new OBSWebSocket()
-        obs.connect({ address: 'localhost:' + this.$store.state.obsInfo.obsPort, password: this.$store.state.obsInfo.obsPass })
+        obs.connect('ws://localhost:' + this.$store.state.obsInfo.obsPort,this.$store.state.obsInfo.obsPass)
           .then(() => {
-            obs.send('SetStreamSettings', {
-              'type': "rtmp_custom",
-              settings: {
+            obs.call('SetStreamServiceSettings', {
+              'streamServiceType': "rtmp_custom",
+              streamServiceSettings: {
                 server: this.$store.state.liveInfo.liveStreamUrl,
                 key: this.$store.state.liveInfo.liveStreamKey,
                 use_auth: false,
@@ -599,12 +771,12 @@ export default {
               this.$BilibiliCommon.saveNewData(this)
               this.showSnackbar("链接成功，已经启动OBS控制")
             }).catch(err => {
-              this.showSnackbar("写入OBS失败：" + err.error)
+              this.showSnackbar("写入OBS失败：" + err)
             }).bind(this)
             obs.disconnect()
           })
           .catch(err => {
-            this.showSnackbar("连接OBS失败：" + err.error)
+            this.showSnackbar("连接OBS失败：" + err)
           })
       } else {
         this.showSnackbar("请好好填写OBS控制端口")
@@ -613,11 +785,11 @@ export default {
     writeOBSWS() {
       if (this.$store.state.obsInfo.obsEnabled) {
         const obs = new OBSWebSocket()
-        obs.connect({ address: 'localhost:' + this.$store.state.obsInfo.obsPort, password: this.$store.state.obsInfo.obsPass })
+        obs.connect('ws://localhost:' + this.$store.state.obsInfo.obsPort, this.$store.state.obsInfo.obsPass)
           .then(() => {
-            obs.send('SetStreamSettings', {
-              'type': "rtmp_custom",
-              settings: {
+            obs.call('SetStreamServiceSettings', {
+              'streamServiceType': "rtmp_custom",
+              streamServiceSettings: {
                 server: this.$store.state.liveInfo.liveStreamUrl,
                 key: this.$store.state.liveInfo.liveStreamKey,
                 use_auth: false,
@@ -626,46 +798,46 @@ export default {
             }).then(() => {
               this.showSnackbar("写入OBS成功")
             }).catch(err => {
-              this.showSnackbar("写入OBS失败：" + err.error)
+              this.showSnackbar("写入OBS失败：" + err)
             }).bind(this)
             obs.disconnect()
           })
           .catch(err => {
-            this.showSnackbar("连接OBS失败：" + err.error)
+            this.showSnackbar("连接OBS失败：" + err)
           })
       }
     },
     startOBSWSStreaming() {
       if (this.$store.state.obsInfo.obsEnabled) {
         const obs = new OBSWebSocket()
-        obs.connect({ address: 'localhost:' + this.$store.state.obsInfo.obsPort, password: this.$store.state.obsInfo.obsPass })
+        obs.connect('ws://localhost:' + this.$store.state.obsInfo.obsPort, this.$store.state.obsInfo.obsPass)
           .then(() => {
-            obs.send('StartStreaming').then(() => {
+            obs.call('StartStream').then(() => {
               this.showSnackbar("开始推流成功")
             }).catch(err => {
-              this.showSnackbar("开始推流失败：" + err.error)
+              this.showSnackbar("开始推流失败：" + err)
             }).bind(this)
             obs.disconnect()
           })
           .catch(err => {
-            this.showSnackbar("连接OBS失败：" + err.error)
+            this.showSnackbar("连接OBS失败：" + err)
           })
       }
     },
     stopOBSWSStreaming() {
       if (this.$store.state.obsInfo.obsEnabled) {
         const obs = new OBSWebSocket()
-        obs.connect({ address: 'localhost:' + this.$store.state.obsInfo.obsPort, password: this.$store.state.obsInfo.obsPass })
+        obs.connect('ws://localhost:' + this.$store.state.obsInfo.obsPort, this.$store.state.obsInfo.obsPass)
           .then(() => {
-            obs.send('StopStreaming').then(() => {
+            obs.call('StopStream').then(() => {
               this.showSnackbar("停止推流成功")
             }).catch(err => {
-              this.showSnackbar("停止推流失败：" + err.error)
+              this.showSnackbar("停止推流失败：" + err)
             }).bind(this)
             obs.disconnect()
           })
           .catch(err => {
-            this.showSnackbar("连接OBS失败：" + err.error)
+            this.showSnackbar("连接OBS失败：" + err)
           })
       }
     },

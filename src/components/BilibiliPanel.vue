@@ -142,6 +142,7 @@ export default {
   },
   async created() {
     var result = await this.$BilibiliCommon.getHTTPResult(
+      this, 
       "https://b-helper.oss-cn-shanghai.aliyuncs.com/BLiveHelper/latest.yml",
       "",
       []
@@ -315,6 +316,7 @@ export default {
       switch (this.dialogAction) {
         case "update":
           var result = await this.$BilibiliCommon.getHTTPResult(
+            this, 
             "https://b-helper.oss-cn-shanghai.aliyuncs.com/BLiveHelper/latest.yml",
             "",
             []

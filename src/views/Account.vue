@@ -1,6 +1,9 @@
 <template>
   <div class="account">
     <v-container style="max-width: 100% !important">
+      <v-switch v-model="$store.state.config.usePrivateProxy"
+        label="使用代理链接API（需自行配置）"></v-switch>
+      <v-btn class="ma-2" elevation="2" color="success" @click="saveSettings">保存</v-btn>
       <v-container v-if="$store.state.config.isLogin" style="max-width: 100% !important">
         <v-row>
           <v-col cols="12" md="12">
@@ -19,6 +22,7 @@
         <div>
           <qrcode :value="qrcodeUrl" :options="{ width: 400 }"></qrcode>
         </div>
+        <v-btn class="ma-2" @click="reloadAccount" elevation="2" color="error">刷新</v-btn>
       </v-container>
     </v-container>
   </div>
@@ -46,9 +50,13 @@ export default {
     }
   },
   methods: {
+    saveSettings(){
+      this.$BilibiliCommon.saveNewData(this)
+    },
     //登录主站，只有一个地方需要所以就丢这里了
     async fetchLogin() {
       var res = await this.$BilibiliCommon.postHTTPResult(
+        this, 
         "https://passport.bilibili.com/qrcode/getLoginInfo",
         "https://passport.bilibili.com/login",
         {},
@@ -64,6 +72,7 @@ export default {
         clearTimeout(this.fetchLoginStatusTimer)
         this.$store.state.BilibiliCommonCache.cookies = res.headers["set-cookie"]
         var res = await this.$BilibiliCommon.getHTTPResult(
+          this, 
           "http://api.bilibili.com/x/web-interface/nav",
           "",
           this.$store.state.BilibiliCommonCache.cookies

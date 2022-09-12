@@ -3,6 +3,7 @@ import eConfig from "electron-config"
 import cookie from "cookie"
 import got from "got"
 import axios from 'axios'
+import { MyProxy } from '@/MyProxy'
 
 const econfig = new eConfig()
 const UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.111 Safari/537.36"
@@ -13,6 +14,7 @@ export default {
   //存储区逻辑
   //同步存储数据，经典的this和that！
   getSavedData(that) {
+    that.$store.state.config.usePrivateProxy = econfig.get("config.usePrivateProxy")
     that.$store.state.BilibiliCommonCache.cookies = econfig.get("BilibiliCommonCache.cookies")
 
     that.$store.state.obsInfo.obsPort = econfig.get("obsInfo.obsPort")
@@ -45,6 +47,8 @@ export default {
 
   //全部数据保存
   saveNewData(that) {
+    econfig.set("config.usePrivateProxy", that.$store.state.config.usePrivateProxy)
+
     econfig.set("BilibiliCommonCache.cookies", that.$store.state.BilibiliCommonCache.cookies)
 
     //保存的房间ID，弹幕显示用
@@ -77,7 +81,8 @@ export default {
   //刷新登录区逻辑
   async getLoginDataFromCookies(that) {
     const res = await this.getHTTPResult(
-      "http://api.bilibili.com/x/web-interface/nav",
+      that, 
+      "https://api.bilibili.com/x/web-interface/nav",
       "",
       that.$store.state.BilibiliCommonCache.cookies
     )
@@ -93,6 +98,7 @@ export default {
 
   async getRoomId(that) {
     const res = await this.getHTTPResult(
+      that, 
       "https://api.live.bilibili.com/live_user/v1/UserInfo/live_info",
       "",
       that.$store.state.BilibiliCommonCache.cookies
@@ -103,10 +109,21 @@ export default {
     }
   },
 
+  rewriteUrlBeforeResult(that, url){
+    console.log(that)
+    if(that.$store.state.config.usePrivateProxy){
+      Object.keys(MyProxy).forEach(key => {
+        url = url.replace(key, MyProxy[key])
+        //console.log(key, MyProxy[key])
+      })
+      console.log("url final:" + url)
+    }
+    return url
+  },
   //不同请求有不同的referer和ua需求，这里统一封装方法。因为formdata有点问题所以多一个RawBody（Buffer）的方法
-  async postHTTPResult(url, referer, cookies, form) {
+  async postHTTPResult(that, url, referer, cookies, form) {
     try {
-      const res = await got(url, {
+      const res = await got(this.rewriteUrlBeforeResult(that, url), {
         method: "POST",
         headers: {
           Referer: referer,
@@ -120,9 +137,9 @@ export default {
       return error.response
     }
   },
-  async postHTTPRawBody(url, referer, cookies, contentType, body) {
+  async postHTTPRawBody(that, url, referer, cookies, contentType, body) {
     try {
-      const res = await got(url, {
+      const res = await got(this.rewriteUrlBeforeResult(that, url), {
         method: "POST",
         headers: {
           Referer: referer,
@@ -137,9 +154,9 @@ export default {
       return error.response
     }
   },
-  async postHTTPFormData(url, referer, cookies, body) {
+  async postHTTPFormData(that, url, referer, cookies, body) {
     try {
-      const res = await got(url, {
+      const res = await got(this.rewriteUrlBeforeResult(that, url), {
         method: "POST",
         headers: {
           Referer: referer,
@@ -153,9 +170,9 @@ export default {
       return error.response
     }
   },
-  async getHTTPResult(url, referer, cookies) {
+  async getHTTPResult(that, url, referer, cookies) {
     try {
-      const res = await got(url, {
+      const res = await got(this.rewriteUrlBeforeResult(that, url), {
         method: "GET",
         headers: {
           Referer: referer,

@@ -20,13 +20,14 @@ Vue.use(VueClipboard)
 Vue.use(Vuex)
 
 
-Vue.prototype.$version = "0.1.4"
+Vue.prototype.$version = "0.1.6" 
 Vue.prototype.$BilibiliCommon = BilibiliCommon
 
 const store = new Vuex.Store({
   state: {
     config: {
       isLogin: false,
+      usePrivateProxy: false,
     },
     //B站登录的缓存
     BilibiliCommonCache: {
